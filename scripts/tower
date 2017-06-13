@@ -1,0 +1,16 @@
+var actionRepair = require('action.repair');
+var actionAttack = require('action.attack');
+
+var tower = {
+
+    run: function(id) {
+        var tower = Game.getObjectById(id);
+        if(tower) {
+            if(!actionRepair.run(tower)) {
+                actionAttack.run(tower);
+            }
+        }
+    }
+};
+
+module.exports = tower;
