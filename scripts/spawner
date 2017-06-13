@@ -1,0 +1,44 @@
+let roles = ['harvester', 'upgrader', 'builder'];
+let limits = [8, 4, 4];
+
+var spawner = {
+
+    run: function(name) {
+        
+        if(Game.spawns[name].spawning) {
+            
+            var spawningCreep = Game.creeps[Game.spawns[name].spawning.name];
+            Game.spawns[name].room.visual.text(
+                '🛠️' + spawningCreep.memory.role,
+                Game.spawns[name].pos.x + 1,
+                Game.spawns[name].pos.y,
+                {align: 'left', opacity: 0.8});
+        }
+        
+        for( let index in roles ) {
+            
+            let role = roles[index];
+            let max = limits[index];
+            let filtered = _.filter(Game.creeps, (creep) => creep.memory.role == role);
+            if(global.update == global.UPDATE_CYCLE) {
+                console.log('Room "' + Game.spawns[name].room.name + '" has ' 
+                + filtered.length + ' ' + role + (filtered.length > 1 ? 's' : ''));
+            }
+            if( filtered.length < max ) {
+                
+                var newName = Game.spawns[name].createCreep([WORK,WORK,CARRY,MOVE], undefined, {role: role});
+                if( typeof newName == 'string' ) {
+                    global.MIN_ENERGY = 0;
+                    console.log('Spawning new ' + role + ': ' + newName);
+                } else if (newName == -6) {
+                    if(global.update == global.UPDATE_CYCLE) {
+                        console.log('Saving energy for a new ' + role)
+                    }
+                    global.MIN_ENERGY = 350;
+                }
+            }
+        }
+    }
+};
+
+module.exports = spawner;
